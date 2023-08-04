@@ -1,6 +1,10 @@
 package com.example.blogapi.article;
+import com.example.blogapi.comment.CommentEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -17,5 +21,6 @@ public class ArticleEntity {
     private String description;
     @Column(nullable = false)
     private String content;
-
+    @OneToMany(mappedBy = "article",cascade=CascadeType.ALL,orphanRemoval = true)
+    Set<CommentEntity> comments=new HashSet<>();
 }

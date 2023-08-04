@@ -1,10 +1,13 @@
 package com.example.blogapi.article;
 
 import com.example.blogapi.Exceptions.ResourceNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static com.example.blogapi.utils.constants.*;
 
 
 @RestController
@@ -18,7 +21,7 @@ public class ArticleController {
 
 
     @PostMapping("/addarticle")
-    ResponseEntity<ArticleDTO> createArticle(@RequestBody ArticleDTO article){
+    ResponseEntity<ArticleDTO> createArticle(@Valid @RequestBody ArticleDTO article){
 
         ArticleDTO articleResponse=articleService.createArticle(article);
         return new ResponseEntity<>(articleResponse,HttpStatus.CREATED);
@@ -26,10 +29,10 @@ public class ArticleController {
 
     @GetMapping
     ArticleResponse getAllArticles(
-            @RequestParam(value="pageNo",defaultValue="0",required = false) int pageNo,
-            @RequestParam(value="pageSize",defaultValue = "2",required=false) int pageSize,
-            @RequestParam(value="sortBy",defaultValue="id",required=false) String sortBy,
-            @RequestParam(value="sortDir",defaultValue="ASC",required=false) String sortDir){
+            @RequestParam(value="pageNo",defaultValue=DEFAULT_PAGENO,required = false) int pageNo,
+            @RequestParam(value="pageSize",defaultValue =DEFAULT_PAGESIZE,required=false) int pageSize,
+            @RequestParam(value="sortBy",defaultValue=DEFAULT_SORTBY,required=false) String sortBy,
+            @RequestParam(value="sortDir",defaultValue=DEFAULT_SORTBYDIRECTION,required=false) String sortDir){
 
         return articleService.getAllArticles(pageNo,pageSize,sortBy,sortDir);
 
@@ -49,7 +52,7 @@ public class ArticleController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<ArticleDTO> updateArticle(@RequestBody ArticleDTO article,@PathVariable long id){
+    ResponseEntity<ArticleDTO> updateArticle(@Valid @RequestBody ArticleDTO article,@PathVariable long id){
 
         ArticleDTO result;
         try {

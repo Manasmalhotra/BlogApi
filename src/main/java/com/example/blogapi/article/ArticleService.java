@@ -1,6 +1,7 @@
 package com.example.blogapi.article;
 
 import com.example.blogapi.Exceptions.ResourceNotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,20 +14,18 @@ import java.util.stream.Collectors;
 @Service
 public class ArticleService {
     ArticleRepository articleRepository;
-    public ArticleService(ArticleRepository ar){
-        articleRepository=ar;
+    ModelMapper mapper;
+    public ArticleService(ArticleRepository ar,ModelMapper mapper){
+
+        this.articleRepository=ar;
+        this.mapper=mapper;
     }
 
     ArticleEntity mapDTOToArticle(ArticleDTO articleDTO){
-        ArticleEntity article=new ArticleEntity();
-        article.setTitle(articleDTO.getTitle());
-        article.setDescription(articleDTO.getDescription());
-        article.setContent(articleDTO.getContent());
-        return article;
+        return mapper.map(articleDTO,ArticleEntity.class);
     }
     ArticleDTO mapArticletoArticleDTO(ArticleEntity article){
-        ArticleDTO articleDTO=new ArticleDTO(article.getId(), article.getTitle(),article.getDescription(),article.getContent());
-        return articleDTO;
+        return mapper.map(article,ArticleDTO.class);
     }
 
     public ArticleDTO createArticle(ArticleDTO article) {
