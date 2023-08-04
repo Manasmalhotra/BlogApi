@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static com.example.blogapi.utils.constants.*;
@@ -20,6 +21,7 @@ public class ArticleController {
     }
 
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/addarticle")
     ResponseEntity<ArticleDTO> createArticle(@Valid @RequestBody ArticleDTO article){
 
@@ -63,6 +65,7 @@ public class ArticleController {
         return ResponseEntity.ok(result);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     ResponseEntity<String> deleteArticle(@PathVariable long id) throws ResourceNotFoundException {
         articleService.deleteArticle(id);
