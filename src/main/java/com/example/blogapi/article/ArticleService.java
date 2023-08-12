@@ -1,5 +1,7 @@
 package com.example.blogapi.article;
 
+import com.example.blogapi.Category.CategoryEntity;
+import com.example.blogapi.Category.CategoryRepository;
 import com.example.blogapi.Exceptions.ResourceNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -14,10 +16,12 @@ import java.util.stream.Collectors;
 @Service
 public class ArticleService {
     ArticleRepository articleRepository;
+    CategoryRepository categoryRepository;
     ModelMapper mapper;
-    public ArticleService(ArticleRepository ar,ModelMapper mapper){
+    public ArticleService(ArticleRepository ar,CategoryRepository categoryRepository,ModelMapper mapper){
 
         this.articleRepository=ar;
+        this.categoryRepository=categoryRepository;
         this.mapper=mapper;
     }
 
@@ -28,8 +32,12 @@ public class ArticleService {
         return mapper.map(article,ArticleDTO.class);
     }
 
-    public ArticleDTO createArticle(ArticleDTO article) {
+    public ArticleDTO createArticle(ArticleDTO article) throws ResourceNotFoundException {
+        CategoryEntity category=categoryRepository.findById(article.getCategoryId()).orElseThrow(
+                ()->new ResourceNotFoundException("Category","Id",article.getCategoryId())
+        );
         ArticleEntity articleToSave=mapDTOToArticle(article);
+        articleToSave.setCategory(category);
         return mapArticletoArticleDTO(articleRepository.save(articleToSave));
     }
 
@@ -50,9 +58,13 @@ public class ArticleService {
 
     public ArticleDTO updateArticle(ArticleDTO article,long id) throws ResourceNotFoundException {
         ArticleEntity result=articleRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Article","ID",id));
+        CategoryEntity category=categoryRepository.findById(article.getCategoryId()).orElseThrow(
+                ()->new ResourceNotFoundException("Category","Id",article.getCategoryId())
+        );
         result.setTitle(article.getTitle());
         result.setDescription(article.getDescription());
         result.setContent(article.getContent());
+        result.setCategory(category);
         ArticleEntity updatedArticle=articleRepository.save(result);
         return mapArticletoArticleDTO(updatedArticle);
     }
@@ -60,5 +72,12 @@ public class ArticleService {
     public void deleteArticle(long id) throws ResourceNotFoundException {
         ArticleEntity result=articleRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Article","ID",id));
         articleRepository.delete(result);
+    }
+
+    public List<ArticleDTO>getArticleByCategory(long categoryId) throws ResourceNotFoundException {
+        CategoryEntity category=categoryRepository.findById(categoryId)
+                .orElseThrow(()->new ResourceNotFoundException("Category","ID",categoryId));
+        List<ArticleEntity>articles=articleRepository.findByCategoryId(categoryId);
+        return articles.stream().map((article)->mapArticletoArticleDTO(article)).collect(Collectors.toList());
     }
 }

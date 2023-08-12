@@ -1,5 +1,7 @@
-package com.example.blogapi.user;
+package com.example.blogapi.auth;
 
+import com.example.blogapi.user.UserEntity;
+import com.example.blogapi.user.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

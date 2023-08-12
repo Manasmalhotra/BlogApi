@@ -1,4 +1,5 @@
 package com.example.blogapi.article;
+import com.example.blogapi.Category.CategoryEntity;
 import com.example.blogapi.comment.CommentEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,4 +24,7 @@ public class ArticleEntity {
     private String content;
     @OneToMany(mappedBy = "article",cascade=CascadeType.ALL,orphanRemoval = true)
     Set<CommentEntity> comments=new HashSet<>();
+    @ManyToOne
+            @JoinColumn(name="category_id")
+    CategoryEntity category;
 }
