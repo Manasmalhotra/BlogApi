@@ -22,16 +22,24 @@ public class AuthService {
     UserRepository userRepository;
     RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
-    public AuthService(AuthenticationManager authManager,UserRepository userepo,RoleRepository rolerepo,PasswordEncoder passwordencoder){
+
+    JwtTokenProvider tokenProvider;
+    public AuthService(AuthenticationManager authManager,
+                       UserRepository userepo,
+                       RoleRepository rolerepo,
+                       PasswordEncoder passwordencoder,
+                       JwtTokenProvider jwtTokenProvider){
         this.authenticationManager=authManager;
         this.userRepository=userepo;
         this.roleRepository=rolerepo;
         this.passwordEncoder=passwordencoder;
+        this.tokenProvider=jwtTokenProvider;
     }
     public String login(LoginDTO loginDTO){
        Authentication authenticate=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsernameOrEmail(),loginDTO.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
-        return "User login successful";
+        String token= tokenProvider.generateToken(authenticate);
+        return token;
     }
 
     public String register(RegisterDTO registerDTO){
