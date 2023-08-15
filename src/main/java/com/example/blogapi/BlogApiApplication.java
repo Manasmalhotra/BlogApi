@@ -1,10 +1,14 @@
 package com.example.blogapi;
 
+import com.example.blogapi.role.RoleEntity;
+import com.example.blogapi.role.RoleRepository;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +26,7 @@ import org.springframework.context.annotation.Bean;
         externalDocs = @ExternalDocumentation(description="Spring Boot Blog Ap Documentation"
                                               ,url="https://github.com/Manasmalhotra/BlogApi")
 )
-public class BlogApiApplication {
+public class BlogApiApplication implements CommandLineRunner {
 
     @Bean
     public ModelMapper modelmapper(){
@@ -32,4 +36,21 @@ public class BlogApiApplication {
 		SpringApplication.run(BlogApiApplication.class, args);
 	}
 
+    @Autowired
+    RoleRepository roleRepository;
+
+
+
+    @Override
+    public void run(String... args) throws Exception {
+        /*
+        RoleEntity role1=new RoleEntity();
+        role1.setName("ROLE_ADMIN");
+        roleRepository.save(role1);
+
+        RoleEntity role2=new RoleEntity();
+        role2.setName("ROLE_USER");
+        roleRepository.save(role2);
+     */
+    }
 }

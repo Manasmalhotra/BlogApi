@@ -2,12 +2,17 @@ package com.example.blogapi.article;
 
 import com.example.blogapi.Category.CategoryEntity;
 import com.example.blogapi.Category.CategoryRepository;
+import com.example.blogapi.Exceptions.BlogApiException;
 import com.example.blogapi.Exceptions.ResourceNotFoundException;
+import com.example.blogapi.user.UserEntity;
+import com.example.blogapi.user.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,12 +22,18 @@ import java.util.stream.Collectors;
 public class ArticleService {
     ArticleRepository articleRepository;
     CategoryRepository categoryRepository;
+    UserRepository userRepository;
     ModelMapper mapper;
-    public ArticleService(ArticleRepository ar,CategoryRepository categoryRepository,ModelMapper mapper){
+    public ArticleService(
+            ArticleRepository ar,
+            CategoryRepository categoryRepository,
+            UserRepository userRepository,
+            ModelMapper mapper){
 
         this.articleRepository=ar;
         this.categoryRepository=categoryRepository;
         this.mapper=mapper;
+        this.userRepository=userRepository;
     }
 
     ArticleEntity mapDTOToArticle(ArticleDTO articleDTO){
@@ -33,11 +44,16 @@ public class ArticleService {
     }
 
     public ArticleDTO createArticle(ArticleDTO article) throws ResourceNotFoundException {
-        CategoryEntity category=categoryRepository.findById(article.getCategoryId()).orElseThrow(
-                ()->new ResourceNotFoundException("Category","Id",article.getCategoryId())
+        CategoryEntity category=categoryRepository.findByName(article.getCategory()).orElseThrow(
+                ()->new ResourceNotFoundException("Category","Name",article.getCategory().toLowerCase())
         );
         ArticleEntity articleToSave=mapDTOToArticle(article);
         articleToSave.setCategory(category);
+        String author=SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user=userRepository.findByUsernameOrEmail(author,author).orElseThrow(
+                ()->new BlogApiException(HttpStatus.BAD_REQUEST,"Author not found")
+        );
+        articleToSave.setAuthor(user);
         return mapArticletoArticleDTO(articleRepository.save(articleToSave));
     }
 
@@ -58,20 +74,33 @@ public class ArticleService {
 
     public ArticleDTO updateArticle(ArticleDTO article,long id) throws ResourceNotFoundException {
         ArticleEntity result=articleRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Article","ID",id));
-        CategoryEntity category=categoryRepository.findById(article.getCategoryId()).orElseThrow(
-                ()->new ResourceNotFoundException("Category","Id",article.getCategoryId())
+        CategoryEntity category=categoryRepository.findByName(article.getCategory().toLowerCase()).orElseThrow(
+                ()->new ResourceNotFoundException("Category","Name",article.getCategory().toLowerCase())
         );
-        result.setTitle(article.getTitle());
-        result.setDescription(article.getDescription());
-        result.setContent(article.getContent());
-        result.setCategory(category);
-        ArticleEntity updatedArticle=articleRepository.save(result);
-        return mapArticletoArticleDTO(updatedArticle);
+        String username=SecurityContextHolder.getContext().getAuthentication().getName();
+        if(username.equalsIgnoreCase(result.getAuthor().getUsername())) {
+            result.setTitle(article.getTitle());
+            result.setDescription(article.getDescription());
+            result.setContent(article.getContent());
+            result.setCategory(category);
+            ArticleEntity updatedArticle = articleRepository.save(result);
+            return mapArticletoArticleDTO(updatedArticle);
+        }
+        else{
+            throw new BlogApiException(HttpStatus.UNAUTHORIZED,"User can edit only their own articles.");
+        }
     }
 
     public void deleteArticle(long id) throws ResourceNotFoundException {
         ArticleEntity result=articleRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Article","ID",id));
-        articleRepository.delete(result);
+        String username=SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println(username);
+        if(username.equalsIgnoreCase(result.getAuthor().getUsername()) || username.equalsIgnoreCase(result.getAuthor().getEmail())) {
+            articleRepository.delete(result);
+        }
+        else{
+            throw new BlogApiException(HttpStatus.UNAUTHORIZED,"User can delete only their own articles");
+        }
     }
 
     public List<ArticleDTO>getArticleByCategory(long categoryId) throws ResourceNotFoundException {

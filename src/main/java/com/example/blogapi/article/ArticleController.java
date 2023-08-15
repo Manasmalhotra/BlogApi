@@ -38,7 +38,7 @@ public class ArticleController {
     @SecurityRequirement(
             name="Bearer Authentication"
     )
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/addarticle")
     ResponseEntity<ArticleDTO> createArticle(@Valid @RequestBody ArticleDTO article) throws ResourceNotFoundException {
 
@@ -94,6 +94,10 @@ public class ArticleController {
             responseCode = "200",
             description = "HTTP Status 200 Success"
     )
+    @SecurityRequirement(
+            name="Bearer Authentication"
+    )
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("/{id}")
     ResponseEntity<ArticleDTO> updateArticle(@Valid @RequestBody ArticleDTO article,@PathVariable long id){
 
@@ -113,8 +117,12 @@ public class ArticleController {
     @ApiResponse(
             responseCode = "200",
             description = "HTTP Status 200 Success"
+
     )
-    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(
+            name="Bearer Authentication"
+    )
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{id}")
     ResponseEntity<String> deleteArticle(@PathVariable long id) throws ResourceNotFoundException {
         articleService.deleteArticle(id);
