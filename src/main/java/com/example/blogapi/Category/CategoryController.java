@@ -23,7 +23,9 @@ public class CategoryController {
 
     @Operation(
             summary="Create Categories REST API",
-            description="Create categories REST API is used to save categories in the database"
+            description="Create categories REST API is used to save categories in the database."+
+                         " Please note you won't be able to edit the category without ADMIN privileges so enter the" +
+                    "category accurately."
     )
     @ApiResponse(
             responseCode = "201",
@@ -32,7 +34,7 @@ public class CategoryController {
     @SecurityRequirement(
             name="Bearer Authentication"
     )
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
     public ResponseEntity<CategoryDTO> addCategory(@RequestBody CategoryDTO categoryDTO){
         CategoryDTO savedCategory=categoryService.addCategory(categoryDTO);
@@ -69,11 +71,15 @@ public class CategoryController {
 
     @Operation(
             summary="Update Category REST API",
-            description="Update Category REST API is used to edit the category with the given id and save the updated category in the database"
+            description="Update Category REST API is used to edit the category with the given id and save the updated category in the database"+
+                    "You need to have ADMIN privileges to update a category."
     )
     @ApiResponse(
             responseCode = "200",
             description = "HTTP Status 200 Success"
+    )
+    @SecurityRequirement(
+            name="Bearer Authentication"
     )
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
@@ -83,12 +89,16 @@ public class CategoryController {
     }
 
     @Operation(
-            summary="Delete Categories REST API",
-            description="Delete Category REST API is used to delete the category with the given id from the database"
+            summary="Delete Categories REST API.",
+            description="Delete Category REST API is used to delete the category with the given id from the database." +
+                    "You need to have ADMIN privileges to delete a category"
     )
     @ApiResponse(
             responseCode = "200",
             description = "HTTP Status 200 Success"
+    )
+    @SecurityRequirement(
+            name="Bearer Authentication"
     )
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")

@@ -23,5 +23,4 @@ public class CategoryEntity {
     String description;
     @OneToMany(mappedBy = "category",cascade=CascadeType.ALL,orphanRemoval = true)
     List<ArticleEntity> articles;
-
 }

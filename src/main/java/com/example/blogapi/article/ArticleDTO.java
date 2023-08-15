@@ -43,5 +43,5 @@ public class ArticleDTO {
     @Schema(
             description="Category of the Article"
     )
-    private long categoryId;
+    private String  category;
 }

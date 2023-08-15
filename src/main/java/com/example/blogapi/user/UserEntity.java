@@ -2,6 +2,7 @@ package com.example.blogapi.user;
 
 import com.example.blogapi.role.RoleEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class UserEntity {
     @Column(nullable=false,unique=true)
     String username;
     @Column(nullable=false,unique=true)
+    @Email
     String email;
     @Column(nullable=false)
     String password;
