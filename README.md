@@ -25,7 +25,7 @@ The users can also see the comments on their articles and can comment on other a
 10) AWS
 11) Swagger UI
 
-# Schema
+# Database Schema
 
 ![Blog_Schema (1)](https://github.com/Manasmalhotra/BlogApi/assets/42417319/b99379ff-89c3-4ad9-924b-cfd99a397f5c)
 
