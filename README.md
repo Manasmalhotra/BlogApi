@@ -27,6 +27,6 @@ The users can also see the comments on their articles and can comment on other a
 
 # Database Schema
 
-![Blog_Schema (1)](https://github.com/Manasmalhotra/BlogApi/assets/42417319/b99379ff-89c3-4ad9-924b-cfd99a397f5c)
+![BlogApiSchema](https://github.com/Manasmalhotra/BlogApi/assets/42417319/e01dd3e4-c219-497d-b69f-57e6f830a616)
 
    
